@@ -1,40 +1,35 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include "btf.h"
+#include "types.h"
+#include "util.h"
 
-// returns the total size of a file in bytes
-void btf_file_size(const btf_str f, u64* res)
-{
-    if(f == NULL){
-        *res = BTF_ERROR_NOT_FOUND;
-        return;
-    }
-    struct stat s;
-    i32 stat_ret = lstat(f, &s);
-    if(stat_ret == -1){
-        *res = BTF_ERROR_ACCESS;
-        return;
-    }
-    *res = s.st_size;
-}
+// capacity
 
-bool btf_file_exist(const btf_str path)
+struct btf_capacity* btf_read_cap()
 {
-    struct stat fs;
-    return lstat(path, &fs) != -1;
-}
+    if(!btf_file_exist(BAT_CAP))
+        return NULL;
 
-u64 btf_read(const btf_str source, char* buff, u64 size)
-{
-    i32 fd = open(source, O_RDONLY);
-    if(fd == -1){
-        return -1;
-    }
-    u64 red = read(fd, buff, size);
-    close(fd);
-    return red;
+    u64 fsize;
+    btf_file_size(BAT_CAP, &fsize);
+    if(fsize == 0)
+        return NULL;
+
+    btf_str content = btf_alloc(sizeof(char) * fsize);
+    if(content == NULL)
+        return NULL;
+
+    btf_read(BAT_CAP, content, fsize);
+    struct btf_capacity* cap = 
+        (struct btf_capacity*)btf_alloc(sizeof(struct btf_capacity));
+    cap->bat_percentage = atoi(content);
+    // gotcha free
+    btf_free(content);
+    return cap;
 }

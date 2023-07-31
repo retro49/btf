@@ -2,25 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "types.h"
+
 #ifndef BTF
 #define BTF
-#endif
-
-// btf custom types
-// unsigned types
-typedef char i8;
-typedef short i16;
-typedef int i32;
-typedef long i64;
-
-
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long u64;
-
-typedef FILE* btf_file;
-typedef char* btf_str;
 
 // file path for battery information
 #define BAT_PATH "/sys/class/power_supply/BAT0"
@@ -51,7 +36,96 @@ typedef char* btf_str;
 
 #define DEBUG puts
 
-void btf_file_size(const btf_str, u64*);
-void btf_reseek_file(btf_file);
-u64 btf_read(const btf_str, char*, u64);
-bool btf_file_exist(const btf_str);
+// its just an integer okay
+struct btf_capacity {
+    i64 bat_percentage;
+};
+
+// guess what, somehow you have to clean this memory
+// well every string must be cleaned from the heap
+struct btf_capapcity_level {
+    btf_str bat_level;
+};
+
+// well, we dont have an 8KB ram so long isnt bad.
+struct btf_charge_full{
+    i64 bat_chrg_full;
+};
+
+struct btf_charge_full_design{
+    i64 bat_charge_full_design;
+};
+
+struct btf_charge_now {
+    i64 bat_chrg_now;
+};
+
+struct btf_current_now {
+    i64 bat_current_now;
+};
+
+// still its a string and plz plz clean it up
+// after you finished dude... this is my comment
+struct btf_manufacturer {
+    btf_str bat_manf;
+};
+
+// here we go, clean up kay!
+struct btf_model{
+    btf_str bat_model;
+};
+
+struct btf_present {
+    i64 bat_present;
+};
+
+// the string is here too.
+struct btf_serial {
+    btf_str bat_serial;
+};
+
+// yep clean it again.
+struct btf_status {
+    btf_str bat_status;
+};
+
+// okay okaaay okaaaaay, clean it up.
+struct btf_tech {
+    btf_str bat_tech;
+};
+
+struct btf_type {
+    btf_str bat_type;
+};
+
+struct btf_volt_min_design {
+    i64 bat_volt_min_dis;
+};
+
+struct btf_volt_now {
+    i64 bat_volt_now;
+};
+
+// uevent, where they all gather. yep.
+struct btf_uevent {
+    struct btf_capacity charge_capacity;
+    struct btf_charge_full charge_full;
+    struct btf_charge_full_design charge_full_design;
+    struct btf_charge_now charge_now;
+    struct btf_current_now current_now;
+    struct btf_manufacturer manufacturer;
+    struct btf_model model;
+    struct btf_present present;
+    struct btf_serial serial;
+    struct btf_status status;
+    struct btf_tech technology;
+    struct btf_type type;
+    struct btf_volt_min_design volt_min_design;
+    struct btf_volt_now volt_now;
+};
+
+
+// prototype for testing memory
+struct btf_capacity* btf_read_cap();
+
+#endif
